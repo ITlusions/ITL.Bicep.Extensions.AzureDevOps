@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/powershell:7.4-ubuntu-22.04
+
+WORKDIR /app
+
+# Install Pode module
+RUN pwsh -Command "Install-Module -Name Pode -Force -Scope AllUsers"
+
+COPY src/ITL.Bicep.Extensions.AzureDevOps.PS/ ./ITL.Bicep.Extensions.AzureDevOps.PS/
+
+# ADO_PAT must be injected at runtime — never bake credentials into the image
+EXPOSE 8080
+
+ENTRYPOINT ["pwsh", "-File", "/app/ITL.Bicep.Extensions.AzureDevOps.PS/Server.ps1"]

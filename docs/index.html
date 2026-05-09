@@ -1,0 +1,769 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ITL Bicep Extensions â€” Azure DevOps</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --border:    #30363d;
+      --accent:    #2ea043;
+      --accent2:   #388bfd;
+      --accent3:   #d29922;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --code-bg:   #1c2128;
+      --radius:    8px;
+      --font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    /* â”€â”€ NAV â”€â”€ */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(13,17,23,0.92);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+    .nav-brand { display: flex; align-items: center; gap: .6rem; font-weight: 600; font-size: 1rem; }
+    .nav-brand svg { width: 24px; height: 24px; }
+    nav a { color: var(--muted); text-decoration: none; font-size: .875rem; }
+    nav a:hover { color: var(--text); }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .btn-nav {
+      background: var(--accent);
+      color: #fff;
+      padding: .4rem 1rem;
+      border-radius: var(--radius);
+      font-size: .875rem;
+      font-weight: 600;
+    }
+    .btn-nav:hover { background: #3fb950; color: #fff; }
+
+    /* â”€â”€ HERO â”€â”€ */
+    .hero {
+      max-width: 900px;
+      margin: 5rem auto 3rem;
+      padding: 0 2rem;
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(46,160,67,.15);
+      color: var(--accent);
+      border: 1px solid rgba(46,160,67,.3);
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 600;
+      padding: .25rem .75rem;
+      margin-bottom: 1.5rem;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+      letter-spacing: -.02em;
+    }
+    .hero h1 span { color: var(--accent2); }
+    .hero p {
+      font-size: 1.125rem;
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto 2rem;
+    }
+    .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      padding: .65rem 1.5rem;
+      border-radius: var(--radius);
+      font-size: .95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity .15s;
+    }
+    .btn:hover { opacity: .85; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    /* â”€â”€ CODE WINDOW â”€â”€ */
+    .code-window {
+      max-width: 760px;
+      margin: 3rem auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .code-header {
+      background: var(--surface);
+      padding: .6rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .code-filename { margin-left: auto; font-size: .75rem; color: var(--muted); font-family: var(--font-mono); }
+    pre {
+      background: var(--code-bg);
+      padding: 1.5rem;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      line-height: 1.7;
+    }
+    .kw  { color: #ff7b72; }
+    .str { color: #a5d6ff; }
+    .cm  { color: #8b949e; font-style: italic; }
+    .fn  { color: #d2a8ff; }
+    .id  { color: #ffa657; }
+    .val { color: #79c0ff; }
+
+    /* â”€â”€ SECTION â”€â”€ */
+    section { max-width: 1000px; margin: 0 auto; padding: 4rem 2rem; }
+    section h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: .5rem; }
+    section .sub { color: var(--muted); margin-bottom: 2.5rem; font-size: .95rem; }
+
+    /* â”€â”€ CARDS â”€â”€ */
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      transition: border-color .2s;
+    }
+    .card:hover { border-color: var(--accent2); }
+    .card-icon { font-size: 1.75rem; margin-bottom: .75rem; }
+    .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
+    .card p { color: var(--muted); font-size: .875rem; }
+
+    /* â”€â”€ RUNTIMES â”€â”€ */
+    .runtimes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .runtime {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .runtime-lang {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: .2rem .6rem;
+      border-radius: 4px;
+      margin-bottom: .75rem;
+    }
+    .lang-dotnet  { background: rgba(81,130,187,.2); color: #5182bb; border: 1px solid rgba(81,130,187,.4); }
+    .lang-python  { background: rgba(255,212,59,.15); color: #ffd43b; border: 1px solid rgba(255,212,59,.3); }
+    .lang-pwsh    { background: rgba(1,36,86,.3); color: #5bc0de; border: 1px solid rgba(91,192,222,.3); }
+    .runtime h3   { font-size: 1rem; font-weight: 600; margin-bottom: .3rem; }
+    .runtime p    { color: var(--muted); font-size: .85rem; margin-bottom: .75rem; }
+    .runtime code {
+      display: block;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: .5rem .75rem;
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      color: #a5d6ff;
+    }
+
+    /* â”€â”€ TABLE â”€â”€ */
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th { text-align: left; padding: .6rem 1rem; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+    td { padding: .7rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+    td code { background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: .1rem .4rem; font-family: var(--font-mono); font-size: .82rem; }
+    tr:last-child td { border-bottom: none; }
+    .pill {
+      display: inline-block;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: .15rem .5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .pill-opt  { background: rgba(56,139,253,.15); color: #388bfd; border: 1px solid rgba(56,139,253,.3); }
+    .pill-req  { background: rgba(210,153,34,.15);  color: #d29922;  border: 1px solid rgba(210,153,34,.3); }
+
+    /* â”€â”€ CREDENTIAL CHAIN â”€â”€ */
+    .chain { display: flex; flex-direction: column; gap: .6rem; margin-top: 1.5rem; }
+    .chain-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+    }
+    .chain-item:hover { border-color: var(--accent2); }
+    .chain-num {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent2);
+      color: #fff;
+      font-size: .75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: .1rem;
+    }
+    .chain-body h4 { font-size: .9rem; font-weight: 600; margin-bottom: .2rem; }
+    .chain-body p  { font-size: .83rem; color: var(--muted); }
+
+    /* â”€â”€ STEPS â”€â”€ */
+    .steps { display: flex; flex-direction: column; gap: 1.25rem; }
+    .step  { display: flex; gap: 1rem; }
+    .step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent2);
+      color: #fff;
+      font-size: .8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: .15rem;
+    }
+    .step-content h3 { font-size: .95rem; font-weight: 600; margin-bottom: .25rem; }
+    .step-content p  { color: var(--muted); font-size: .875rem; }
+    .step-content pre {
+      margin-top: .5rem;
+      border-radius: 6px;
+      font-size: .78rem;
+      border: 1px solid var(--border);
+    }
+
+    /* â”€â”€ CALLOUT â”€â”€ */
+    .callout {
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+      background: rgba(210,153,34,.08);
+      border: 1px solid rgba(210,153,34,.25);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin-top: 1.5rem;
+      font-size: .875rem;
+    }
+    .callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+    .callout p { color: var(--text); }
+    .callout p strong { color: var(--accent3); }
+    .callout code { background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: .1rem .4rem; font-family: var(--font-mono); font-size: .8rem; }
+
+    /* â”€â”€ DIVIDER â”€â”€ */
+    hr { border: none; border-top: 1px solid var(--border); }
+
+    /* â”€â”€ FOOTER â”€â”€ */
+    footer {
+      text-align: center;
+      padding: 2.5rem 2rem;
+      color: var(--muted);
+      font-size: .875rem;
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--accent2); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- â”€â”€ NAV â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<nav>
+  <div class="nav-brand">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="24" height="24" rx="6" fill="#2ea043"/>
+      <path d="M7 12L10 15L17 8" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    ITL Bicep Extensions
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#runtimes">Runtimes</a>
+    <a href="#auth">Authentication</a>
+    <a href="#quickstart">Quick Start</a>
+    <a href="https://github.com/ITlusions/ITL.Bicep.Extensions.AzureDevOps" class="btn-nav btn">GitHub â†’</a>
+  </div>
+</nav>
+
+<!-- â”€â”€ HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<div class="hero">
+  <div class="badge">Bicep Extensibility V2 Â· No PAT Required</div>
+  <h1>Azure DevOps Service Connections<br/>as <span>Bicep Resources</span></h1>
+  <p>Declare, create, update and delete Azure DevOps service connections directly in your Bicep templates â€” no scripts, no portal, no drift. Authenticated via Workload Identity Federation or Managed Identity.</p>
+  <div class="hero-actions">
+    <a href="#quickstart" class="btn btn-primary">Get Started</a>
+    <a href="https://github.com/ITlusions/ITL.Bicep.Extensions.AzureDevOps" class="btn btn-secondary">View on GitHub</a>
+  </div>
+</div>
+
+<!-- â”€â”€ CODE WINDOW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<div class="code-window">
+  <div class="code-header">
+    <span class="dot dot-r"></span>
+    <span class="dot dot-y"></span>
+    <span class="dot dot-g"></span>
+    <span class="code-filename">serviceconnections.bicep</span>
+  </div>
+  <pre><span class="kw">extension</span> <span class="id">ado</span>
+
+<span class="kw">resource</span> <span class="fn">conn</span> <span class="str">'ServiceConnection@2024-01-01'</span> = {
+  identifiers: {
+    organization: <span class="id">organization</span>
+    project:      <span class="id">project</span>
+    name:         <span class="str">'my-project-azure-wif'</span>
+  }
+  properties: {
+    type: <span class="str">'AzureRM'</span>
+    url:  <span class="str">'https://management.azure.com/'</span>
+    authorization: {
+      scheme: <span class="str">'WorkloadIdentityFederation'</span>
+      parameters: {
+        tenantid:           <span class="id">tenantId</span>
+        serviceprincipalid: <span class="id">servicePrincipalId</span>
+      }
+    }
+    data: {
+      subscriptionId:   <span class="id">subscriptionId</span>
+      subscriptionName: <span class="id">subscriptionName</span>
+    }
+  }
+}
+
+<span class="cm">// output the assigned endpoint ID</span>
+<span class="kw">output</span> <span class="id">endpointId</span> <span class="kw">string</span> = <span class="fn">conn</span>.properties.<span class="id">id</span></pre>
+</div>
+
+<!-- â”€â”€ FEATURES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<section id="features">
+  <h2>Why use this?</h2>
+  <p class="sub">Stop managing service connections out-of-band. Bring them into your IaC workflow.</p>
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">ðŸ”„</div>
+      <h3>Idempotent by Design</h3>
+      <p>Create or update â€” the provider resolves whether a connection already exists and acts accordingly. Safe to run on every deployment.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">ðŸ›¡ï¸</div>
+      <h3>No PAT Required</h3>
+      <p>Authenticates to Azure DevOps via Workload Identity Federation or Managed Identity. No long-lived Personal Access Token to rotate or leak.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">ðŸ”’</div>
+      <h3>Secrets Never Leak</h3>
+      <p>Credential parameters (<code>accessToken</code>, <code>password</code>, <code>servicePrincipalKey</code>) are stripped from every response before returning to Bicep.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">âš¡</div>
+      <h3>Three Runtimes</h3>
+      <p>Choose .NET 8, Python/FastAPI, or PowerShell/Pode. All expose the same HTTP surface â€” pick the stack that runs in your pipeline.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">ðŸ“¦</div>
+      <h3>Container-Native</h3>
+      <p>Ships as a Docker image pushed to your ACR. The Bicep engine discovers and calls it automatically â€” no sidecar, no SDK changes needed.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">ðŸ”Œ</div>
+      <h3>Standard Extensibility V2</h3>
+      <p>Implements the official Bicep Extensibility V2 protocol. Compatible with any Bicep engine that supports the extensibility preview feature.</p>
+    </div>
+  </div>
+</section>
+
+<hr/>
+
+<!-- â”€â”€ CONNECTION TYPES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<section>
+  <h2>Supported Connection Types</h2>
+  <p class="sub">All types use the same <code>ServiceConnection@2024-01-01</code> resource type.</p>
+  <table>
+    <thead>
+      <tr>
+        <th>type</th>
+        <th>scheme</th>
+        <th>Use Case</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>AzureRM</code></td>
+        <td><code>WorkloadIdentityFederation</code></td>
+        <td>Recommended â€” no secret stored, federated identity</td>
+      </tr>
+      <tr>
+        <td><code>AzureRM</code></td>
+        <td><code>ServicePrincipal</code></td>
+        <td>Classic service principal with client secret</td>
+      </tr>
+      <tr>
+        <td><code>GitHub</code></td>
+        <td><code>Token</code></td>
+        <td>GitHub Personal Access Token connection</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<hr/>
+
+<!-- â”€â”€ RUNTIMES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<section id="runtimes">
+  <h2>Pick Your Runtime</h2>
+  <p class="sub">All three are production-ready and functionally equivalent.</p>
+  <div class="runtimes">
+    <div class="runtime">
+      <span class="runtime-lang lang-dotnet">â— .NET 8 / C#</span>
+      <h3>ASP.NET Core</h3>
+      <p>Uses the official <code>Azure.Deployments.Extensibility.AspNetCore</code> SDK. <code>Azure.Identity</code> <code>DefaultAzureCredential</code> via a delegating handler.</p>
+      <code>docker build -f Dockerfile .</code>
+    </div>
+    <div class="runtime">
+      <span class="runtime-lang lang-python">â— Python 3.12</span>
+      <h3>FastAPI + httpx</h3>
+      <p>Async handlers with Pydantic v2 models. <code>azure-identity</code> async <code>DefaultAzureCredential</code> fetches a Bearer token per request.</p>
+      <code>docker build -f Dockerfile.python .</code>
+    </div>
+    <div class="runtime">
+      <span class="runtime-lang lang-pwsh">â— PowerShell 7</span>
+      <h3>Pode Module</h3>
+      <p>Proper <code>.psm1</code>/<code>.psd1</code> module. Auth via IMDS endpoint or <code>Get-AzAccessToken</code> from <code>Az.Accounts</code>.</p>
+      <code>docker build -f Dockerfile.powershell .</code>
+    </div>
+  </div>
+</section>
+
+<hr/>
+
+<!-- â”€â”€ AUTHENTICATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<section id="auth">
+  <h2>Authentication</h2>
+  <p class="sub">The provider authenticates to Azure DevOps using Azure AD â€” no Personal Access Token required. Credentials are resolved automatically using the following priority chain.</p>
+
+  <div class="chain">
+    <div class="chain-item">
+      <div class="chain-num">1</div>
+      <div class="chain-body">
+        <h4>Workload Identity Federation (AKS / Azure Pipelines)</h4>
+        <p>Pod identity federated to a service principal, or an Azure Pipelines service connection with <em>Workload Identity Federation</em> scheme. Zero secrets â€” no certificate, no password.</p>
+      </div>
+    </div>
+    <div class="chain-item">
+      <div class="chain-num">2</div>
+      <div class="chain-body">
+        <h4>Managed Identity (ACI Â· App Service Â· VM Â· AKS node pool)</h4>
+        <p>Token fetched from the IMDS endpoint at <code>169.254.169.254</code>. For a user-assigned identity, set <code>AZURE_CLIENT_ID</code> to the identity's client ID.</p>
+      </div>
+    </div>
+    <div class="chain-item">
+      <div class="chain-num">3</div>
+      <div class="chain-body">
+        <h4>Azure CLI â€” <code>az login</code> (local development)</h4>
+        <p>After <code>az login</code>, <code>DefaultAzureCredential</code> picks up the CLI session automatically. No extra configuration needed.</p>
+      </div>
+    </div>
+    <div class="chain-item">
+      <div class="chain-num">4</div>
+      <div class="chain-body">
+        <h4>Az.Accounts module (PowerShell only)</h4>
+        <p>After <code>Connect-AzAccount</code>, the PowerShell runtime uses <code>Get-AzAccessToken</code> as a final fallback. Requires <code>Az.Accounts</code> module installed.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">âš ï¸</div>
+    <p><strong>ADO permission required:</strong> The identity used (managed identity, service principal, or signed-in user) must be added as a member of the Azure DevOps <strong>organisation</strong> with <em>Service Connections: Read &amp; manage</em> permission. Azure RBAC roles alone are not sufficient â€” go to <em>Organisation Settings â†’ Users</em> in Azure DevOps and add the identity.</p>
+  </div>
+
+  <h3 style="margin-top:2.5rem; font-size:1.1rem; margin-bottom:.75rem;">Environment Variables</h3>
+  <table>
+    <thead>
+      <tr><th>Variable</th><th>Required</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>AZURE_CLIENT_ID</code></td>
+        <td><span class="pill pill-opt">Optional</span></td>
+        <td>Client ID of a <strong>user-assigned</strong> Managed Identity. Omit for system-assigned MI.</td>
+      </tr>
+      <tr>
+        <td><code>AZURE_TENANT_ID</code></td>
+        <td><span class="pill pill-opt">Optional</span></td>
+        <td>Azure AD tenant ID. Required when authenticating with <code>AZURE_CLIENT_SECRET</code> or <code>AZURE_CLIENT_CERTIFICATE_PATH</code>.</td>
+      </tr>
+      <tr>
+        <td><code>AZURE_CLIENT_SECRET</code></td>
+        <td><span class="pill pill-opt">Optional</span></td>
+        <td>Service Principal client secret. Alternative to Managed Identity for CI environments without IMDS.</td>
+      </tr>
+      <tr>
+        <td><code>AZURE_CLIENT_CERTIFICATE_PATH</code></td>
+        <td><span class="pill pill-opt">Optional</span></td>
+        <td>Path to a PEM or PKCS12 certificate for Service Principal authentication.</td>
+      </tr>
+      <tr>
+        <td><code>AZURE_AD_TOKEN</code></td>
+        <td><span class="pill pill-opt">Optional</span></td>
+        <td>Pre-fetched Bearer token scoped to Azure DevOps (<code>499b84ac-1321-427f-aa17-267ca6975798</code>). Bypasses all credential resolution â€” useful for injecting a pipeline token into the service container. Obtain via: <code>az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv</code></td>
+      </tr>
+      <tr>
+        <td><code>BICEP_EXTENSION_ADO_BASEURI</code></td>
+        <td><span class="pill pill-req">Required*</span></td>
+        <td>Set on the <em>machine running <code>az deployment</code></em> (not in the container). Tells the Bicep engine where to reach the provider. Typically <code>http://localhost:8080</code>. <em>*Set by Bicep engine â€” usually automatic.</em></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<hr/>
+
+<!-- â”€â”€ QUICK START â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<section id="quickstart">
+  <h2>Quick Start</h2>
+  <p class="sub">Up and running in five steps.</p>
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Prerequisites</h3>
+        <p>Install the required tooling and ensure your Azure identity has the correct permissions.</p>
+        <pre># Tooling
+az bicep upgrade                  # Bicep â‰¥ 0.29 required
+az --version                      # Azure CLI â‰¥ 2.50
+docker --version
+
+# Verify the identity has ADO permission
+# Azure DevOps â†’ Organisation Settings â†’ Users â†’ Add [your managed identity / SP]
+# Project Settings â†’ Service connections â†’ Security â†’ grant Creator or Administrator</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Build &amp; push to ACR</h3>
+        <p>Choose any of the three Dockerfiles. The image must be reachable by the machine running <code>az deployment</code>.</p>
+        <pre>az acr login --name itlbicep
+docker build -f Dockerfile -t itlbicep.azurecr.io/extensions/itl-azuredevops:1.0.0 .
+docker push itlbicep.azurecr.io/extensions/itl-azuredevops:1.0.0</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Add bicepconfig.json</h3>
+        <p>Place alongside your <code>.bicep</code> files. Point the <code>ado</code> extension at your ACR image.</p>
+        <pre>{
+  "experimentalFeaturesEnabled": { "extensibility": true },
+  "extensions": {
+    "ado": "br:itlbicep.azurecr.io/extensions/itl-azuredevops:1.0.0"
+  }
+}</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h3>Start the provider</h3>
+        <p>The Bicep engine calls the provider <strong>client-side</strong> â€” ARM never sees ADO resources. The provider must be running on the machine that runs <code>az deployment</code>. In CI/CD, run it as a <strong>service container</strong>.</p>
+        <pre># Local dev â€” Azure CLI credential picked up automatically after 'az login'
+docker run --rm -p 8080:8080 \
+  itlbicep.azurecr.io/extensions/itl-azuredevops:1.0.0
+
+# User-assigned Managed Identity
+docker run --rm -e AZURE_CLIENT_ID=&lt;mi-client-id&gt; -p 8080:8080 \
+  itlbicep.azurecr.io/extensions/itl-azuredevops:1.0.0
+
+# Azure Pipelines â€” inject a pre-fetched ADO token (see Authentication section)
+# Set AZURE_AD_TOKEN in the container env from your pipeline service connection</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h3>Deploy with Bicep</h3>
+        <p>The Bicep engine calls the provider automatically for every <code>ServiceConnection</code> resource.</p>
+        <pre>az deployment group create \
+  --resource-group my-rg \
+  --template-file examples/serviceconnections.bicep \
+  --parameters organization=itlusions project=my-project \
+               subscriptionId=&lt;sub-id&gt; tenantId=&lt;tenant-id&gt; \
+               servicePrincipalId=&lt;app-id&gt; subscriptionName="My Sub" \
+               githubToken=&lt;ghp_...&gt;</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr/>
+
+<!-- â”€â”€ PIPELINE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<section id="pipeline">
+  <h2>CI/CD Pipelines</h2>
+  <p class="sub">Run the provider as a service container â€” no PAT pipeline variable needed.</p>
+
+  <h3 style="font-size:1rem; margin-bottom:.75rem; color:var(--accent2);">Azure Pipelines</h3>
+  <div class="code-window" style="margin:0 0 2rem;">
+    <div class="code-header">
+      <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+      <span class="code-filename">azure-pipelines.yml</span>
+    </div>
+    <pre>resources:
+  containers:
+    - container: ado_provider
+      image: itlbicep.azurecr.io/extensions/itl-azuredevops:1.0.0
+      ports:
+        - 8080:8080
+
+jobs:
+  - job: Deploy
+    services:
+      ado_provider: ado_provider
+    steps:
+      - task: AzureCLI@2
+        displayName: Deploy Bicep (inject ADO token into provider)
+        env:
+          BICEP_EXTENSION_ADO_BASEURI: http://localhost:8080
+        inputs:
+          azureSubscription: my-service-connection   # WIF service connection
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            ADO_TOKEN=$(az account get-access-token \
+              --resource 499b84ac-1321-427f-aa17-267ca6975798 \
+              --query accessToken -o tsv)
+            export AZURE_AD_TOKEN=$ADO_TOKEN
+
+            az deployment group create \
+              --resource-group my-rg \
+              --template-file examples/serviceconnections.bicep \
+              --parameters organization=itlusions project=my-project \
+                           subscriptionId=$(SUB_ID) tenantId=$(TENANT_ID) \
+                           servicePrincipalId=$(SP_ID) subscriptionName="My Sub"</pre>
+  </div>
+
+  <h3 style="font-size:1rem; margin-bottom:.75rem; color:var(--accent2);">GitHub Actions</h3>
+  <div class="code-window" style="margin:0;">
+    <div class="code-header">
+      <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+      <span class="code-filename">.github/workflows/deploy.yml</span>
+    </div>
+    <pre>jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # required for OIDC login
+      contents: read
+    services:
+      ado-provider:
+        image: itlbicep.azurecr.io/extensions/itl-azuredevops:1.0.0
+        ports:
+          - 8080:8080
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Bicep (inject ADO token into provider)
+        env:
+          BICEP_EXTENSION_ADO_BASEURI: http://localhost:8080
+        run: |
+          ADO_TOKEN=$(az account get-access-token \
+            --resource 499b84ac-1321-427f-aa17-267ca6975798 \
+            --query accessToken -o tsv)
+          export AZURE_AD_TOKEN=$ADO_TOKEN
+
+          az deployment group create \
+            --resource-group my-rg \
+            --template-file examples/serviceconnections.bicep \
+            --parameters organization=itlusions project=my-project \
+                         subscriptionId=${{ vars.SUB_ID }} \
+                         tenantId=${{ vars.TENANT_ID }} \
+                         servicePrincipalId=${{ vars.SP_ID }} \
+                         subscriptionName="My Sub" \
+                         githubToken=${{ secrets.GITHUB_TOKEN }}</pre>
+  </div>
+</section>
+
+<hr/>
+
+<!-- â”€â”€ HOW IT WORKS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<section>
+  <h2>How It Works</h2>
+  <p class="sub">ADO resources are processed client-side â€” Azure ARM is never involved.</p>
+  <div class="code-window" style="margin:0;">
+    <div class="code-header">
+      <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+      <span class="code-filename">execution flow</span>
+    </div>
+    <pre>CI agent / local machine
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  az deployment group create                                   â”‚
+â”‚     â””â”€ Bicep engine processes template                        â”‚
+â”‚           â””â”€ HTTP POST â†’ localhost:8080  (this provider)      â”‚
+â”‚                 â””â”€ provider obtains Azure AD Bearer token     â”‚
+â”‚                       â””â”€ calls Azure DevOps REST API v7.1    â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+               â†“ compiled ARM  (no ADO resources)
+            Azure ARM â€” deploys Azure resources only</pre>
+  </div>
+</section>
+
+<hr/>
+
+<!-- â”€â”€ FOOTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<footer>
+  <p>Built by <a href="https://github.com/ITlusions">ITLusions</a> Â· MIT License Â·
+     <a href="https://github.com/ITlusions/ITL.Bicep.Extensions.AzureDevOps">GitHub</a> Â·
+     <a href="https://github.com/Azure/bicep-extensibility">Bicep Extensibility Spec</a>
+  </p>
+</footer>
+
+</body>
+</html>

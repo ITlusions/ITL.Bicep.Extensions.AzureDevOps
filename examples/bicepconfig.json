@@ -1,0 +1,18 @@
+// bicepconfig.json — place this in your repo root or alongside your .bicep files
+//
+// This file tells the Bicep engine:
+//   1. WHAT TYPES exist         → the OCI artifact in ACR (schema / intellisense)
+//   2. WHERE the provider runs  → via the BICEP_EXTENSION_ADO_BASEURI environment variable
+//                                  set on the machine running `az deployment`
+//
+// The runtime endpoint is NOT stored here — set it as an env var before deploying:
+//   $env:BICEP_EXTENSION_ADO_BASEURI = "http://localhost:8080"   # local / service container
+//   $env:BICEP_EXTENSION_ADO_BASEURI = "https://ado-provider.internal"  # shared provider
+{
+  "experimentalFeaturesEnabled": {
+    "extensibility": true
+  },
+  "extensions": {
+    "ado": "br:itlbicep.azurecr.io/extensions/itl-azuredevops:1.0.0"
+  }
+}

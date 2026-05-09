@@ -1,0 +1,26 @@
+[project]
+name = "itl-bicep-ext-azuredevops"
+version = "1.0.0"
+description = "ITL Bicep Extension — Azure DevOps Service Connections"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "httpx>=0.27",
+    "pydantic>=2.7",
+    "azure-identity>=1.18",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio>=0.23",
+    "httpx>=0.27",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/itl_bicep_ext_azuredevops"]
