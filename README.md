@@ -1,6 +1,10 @@
 # ITL Bicep Extensions — Azure DevOps
 
-> Manage Azure DevOps service connections as Bicep resources using the [Bicep Extensibility V2 protocol](https://github.com/Azure/bicep-extensibility).
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/itlusions/ITL.Bicep.Extensions.AzureDevOps)](https://github.com/itlusions/ITL.Bicep.Extensions.AzureDevOps/releases)
+[![Docker](https://img.shields.io/badge/docker-ready-brightgreen)](https://github.com/itlusions/ITL.Bicep.Extensions.AzureDevOps/pkgs/container/itl-bicep-ext-azuredevops)
+
+> **Declarative Infrastructure-as-Code for Azure DevOps** — Manage Azure DevOps service connections as Bicep resources using the [Bicep Extensibility V2 protocol](https://github.com/Azure/bicep-extensibility).
 
 ```bicep
 extension ado
@@ -23,21 +27,41 @@ resource conn 'ServiceConnection@2024-01-01' = {
 }
 ```
 
+## 📖 Documentation
+
+- **[Architecture Guide](docs/ARCHITECTURE.md)** — How the extensibility provider works
+- **[API Reference](docs/API-REFERENCE.md)** — Complete resource schema and operations
+- **[Deployment Guide](docs/DEPLOYMENT.md)** — Production deployment patterns (ACI, AKS, App Service)
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** — Common issues and solutions
+- **[Contributing](docs/CONTRIBUTING.md)** — Development setup and contribution guidelines
+
 ---
 
 ## Overview
 
 This project is a **Bicep extensibility provider** that exposes Azure DevOps service connections as first-class Bicep resources. Once deployed, the provider lets you declare, create, update, and delete service connections in Azure DevOps directly from Bicep templates — no scripts, no manual portal steps.
 
-Three implementation options are included — pick the runtime that fits your stack:
+### ✨ Key Features
 
-| Implementation | Entry point | Docker file |
-|---|---|---|
-| **.NET 8 / C#** | `src/ITL.Bicep.Extensions.AzureDevOps/` | `Dockerfile` |
-| **Python / FastAPI** | `src/itl_bicep_ext_azuredevops/` | `Dockerfile.python` |
-| **PowerShell / Pode** | `src/ITL.Bicep.Extensions.AzureDevOps.PS/` | `Dockerfile.powershell` |
+- **🔐 Secure by default** — Uses Azure Workload Identity / Managed Identity (no PAT required)
+- **📝 Declarative IaC** — Service connections defined alongside Azure resources in Bicep
+- **🔄 Idempotent operations** — Safe to re-run deployments (create-or-update semantics)
+- **🎯 Type-safe** — Full IntelliSense support in VS Code with Bicep extension
+- **🐳 Container-native** — Deploy on ACI, AKS, App Service, or locally with Docker
+- **🌐 Multi-runtime** — Choose .NET, Python, or PowerShell based on your stack
+- **🔍 Observable** — Structured logging, OpenTelemetry support, Scalar API explorer
 
-All three expose the same HTTP surface and are functionally equivalent.
+### 🏗️ Implementation Options
+
+Three functionally equivalent implementations are included — pick the runtime that fits your infrastructure:
+
+| Implementation | Entry point | Docker file | Runtime |
+|---|---|---|---|
+| **.NET 8 / C#** | `src/ITL.Bicep.Extensions.AzureDevOps/` | `Dockerfile` | ASP.NET Core 8 |
+| **Python / FastAPI** | `src/itl_bicep_ext_azuredevops/` | `Dockerfile.python` | Python 3.12 + FastAPI |
+| **PowerShell / Pode** | `src/ITL.Bicep.Extensions.AzureDevOps.PS/` | `Dockerfile.powershell` | PowerShell 7 + Pode |
+
+All three expose the same HTTP API surface and handle authentication via **Azure DefaultAzureCredential**.
 
 ---
 
