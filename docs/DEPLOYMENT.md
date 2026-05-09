@@ -1,7 +1,20 @@
 # Deployment Guide
 
 Production deployment patterns for the ITL Bicep Azure DevOps extensibility provider.
+## Table of Contents
 
+- [Overview](#overview)
+- [Deployment Options Comparison](#deployment-options-comparison)
+- [1. Local Development](#1-local-development)
+- [2. Azure Container Instances (ACI)](#2-azure-container-instances-aci)
+- [3. Azure Kubernetes Service (AKS)](#3-azure-kubernetes-service-aks)
+- [4. Azure App Service](#4-azure-app-service)
+- [5. CI/CD Service Containers (Recommended)](#5-cicd-service-containers-recommended)
+- [Security Considerations](#security-considerations)
+- [Monitoring & Observability](#monitoring--observability)
+- [Cost Optimization](#cost-optimization)
+- [High Availability](#high-availability)
+- [Troubleshooting](#troubleshooting)
 ## Overview
 
 The provider must be running and network-accessible when you execute `az deployment` commands. This guide covers deployment options ranging from local development to enterprise production environments.
@@ -19,6 +32,40 @@ The provider must be running and network-accessible when you execute `az deploym
 | **Azure App Service** | Managed PaaS, easy scaling | Medium | ~$50/month+ | Medium |
 
 **Recommended starting point** — No infrastructure to manage, no extra cost, provider spins up only when pipeline runs.
+
+---
+
+## Choosing the Right Deployment Option
+
+**Use the decision tree below to pick the best deployment pattern:**
+
+```mermaid
+flowchart TD
+    A[Start] --> B{Only deploying via<br/>CI/CD pipelines?}
+    B -->|Yes| C[Service Containers<br/>Recommended]
+    B -->|No| D{Need local<br/>development?}
+    D -->|Yes| E[Local Docker]
+    D -->|No| F{Production<br/>requirements?}
+    F -->|Simple, low traffic| G[Azure Container Instances]
+    F -->|Enterprise, HA| H[Azure Kubernetes Service]
+    F -->|Managed PaaS| I[Azure App Service]
+    
+    C --> C1[Zero cost, zero infra]
+    E --> E1[Free, quick iteration]
+    G --> G1[~$15/month, simple setup]
+    H --> H1[~$70/month+, auto-scaling]
+    I --> I1[~$50/month+, easy scaling]
+```
+
+**Decision criteria:**
+
+| Choose... | If you... |
+|---|---|
+| **Service Containers** | Only deploy via GitHub Actions or Azure Pipelines |
+| **Local Docker** | Need to test locally before pushing to CI/CD |
+| **ACI** | Need simple production deployment with low traffic |
+| **AKS** | Need enterprise features (HA, auto-scaling, multi-region) |
+| **App Service** | Want managed PaaS with easy scaling and VNet integration |
 
 ---
 
