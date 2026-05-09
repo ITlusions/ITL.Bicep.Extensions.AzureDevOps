@@ -31,16 +31,16 @@ resource conn 'ServiceConnection@2024-01-01' = {
 
 **New to this project?** Start here:
 
-1. **[Quick Start Guide](docs/QUICKSTART.md)** — Get running in 5 minutes with CI/CD service containers (recommended)
+1. **[Quick Start Guide](docs/guides/QUICKSTART.md)** — Get running in 5 minutes with CI/CD service containers (recommended)
 2. **[Architecture Overview](docs/ARCHITECTURE.md)** — Understand how the provider works
 
 ## Documentation
 
-- **[Quick Start](docs/QUICKSTART.md)** — 5-minute setup guide
+- **[Quick Start](docs/guides/QUICKSTART.md)** — 5-minute setup guide
 - **[Architecture Guide](docs/ARCHITECTURE.md)** — How the extensibility provider works
 - **[API Reference](docs/API-REFERENCE.md)** — Complete resource schema and operations
-- **[Deployment Guide](docs/DEPLOYMENT.md)** — Production deployment patterns (ACI, AKS, App Service)
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** — Common issues and solutions
+- **[Deployment Guide](docs/guides/DEPLOYMENT.md)** — Production deployment patterns (ACI, AKS, App Service)
+- **[Troubleshooting](docs/guides/TROUBLESHOOTING.md)** — Common issues and solutions
 - **[Contributing](docs/CONTRIBUTING.md)** — Development setup and contribution guidelines
 
 **Browse all documentation**: [docs/README.md](docs/README.md)

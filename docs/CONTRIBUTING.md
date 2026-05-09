@@ -441,8 +441,8 @@ function Invoke-Save {
 - Update relevant docs in `docs/`:
   - [ARCHITECTURE.md](ARCHITECTURE.md) — architecture changes
   - [API-REFERENCE.md](API-REFERENCE.md) — new resource types/properties
-  - [DEPLOYMENT.md](DEPLOYMENT.md) — new deployment options
-  - [TROUBLESHOOTING.md](TROUBLESHOOTING.md) — new issues/solutions
+  - [guides/DEPLOYMENT.md](guides/DEPLOYMENT.md) — new deployment options
+  - [guides/TROUBLESHOOTING.md](guides/TROUBLESHOOTING.md) — new issues/solutions
 - Use clear headings, code blocks, and examples
 
 ---

@@ -411,7 +411,7 @@ Export traces to Azure Application Insights, Jaeger, or Zipkin for distributed t
 
 ## Deployment Patterns
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed production deployment patterns including:
+See [guides/DEPLOYMENT.md](guides/DEPLOYMENT.md) for detailed production deployment patterns including:
 
 - Azure Container Instances (ACI)
 - Azure Kubernetes Service (AKS)

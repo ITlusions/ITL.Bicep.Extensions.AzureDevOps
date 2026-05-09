@@ -235,8 +235,8 @@ sequenceDiagram
 
 ## Next Steps
 
-- **Add more connections**: GitHub, Docker Registry → [API Reference](API-REFERENCE.md)
-- **Secure secrets**: Use Key Vault for PATs → [API Reference § Best Practices](API-REFERENCE.md#best-practices)
+- **Add more connections**: GitHub, Docker Registry → [API Reference](../API-REFERENCE.md)
+- **Secure secrets**: Use Key Vault for PATs → [API Reference § Best Practices](../API-REFERENCE.md#best-practices)
 - **Production setup**: Deploy to AKS, ACI → [Deployment Guide](DEPLOYMENT.md)
 - **Troubleshoot**: Fix auth errors → [Troubleshooting](TROUBLESHOOTING.md)
 
