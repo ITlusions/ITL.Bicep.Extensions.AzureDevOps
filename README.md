@@ -27,7 +27,7 @@ resource conn 'ServiceConnection@2024-01-01' = {
 }
 ```
 
-## 📖 Documentation
+## Documentation
 
 - **[Architecture Guide](docs/ARCHITECTURE.md)** — How the extensibility provider works
 - **[API Reference](docs/API-REFERENCE.md)** — Complete resource schema and operations
@@ -41,17 +41,17 @@ resource conn 'ServiceConnection@2024-01-01' = {
 
 This project is a **Bicep extensibility provider** that exposes Azure DevOps service connections as first-class Bicep resources. Once deployed, the provider lets you declare, create, update, and delete service connections in Azure DevOps directly from Bicep templates — no scripts, no manual portal steps.
 
-### ✨ Key Features
+### Key Features
 
-- **🔐 Secure by default** — Uses Azure Workload Identity / Managed Identity (no PAT required)
-- **📝 Declarative IaC** — Service connections defined alongside Azure resources in Bicep
-- **🔄 Idempotent operations** — Safe to re-run deployments (create-or-update semantics)
-- **🎯 Type-safe** — Full IntelliSense support in VS Code with Bicep extension
-- **🐳 Container-native** — Deploy on ACI, AKS, App Service, or locally with Docker
-- **🌐 Multi-runtime** — Choose .NET, Python, or PowerShell based on your stack
-- **🔍 Observable** — Structured logging, OpenTelemetry support, Scalar API explorer
+- **Secure by default** — Uses Azure Workload Identity / Managed Identity (no PAT required)
+- **Declarative IaC** — Service connections defined alongside Azure resources in Bicep
+- **Idempotent operations** — Safe to re-run deployments (create-or-update semantics)
+- **Type-safe** — Full IntelliSense support in VS Code with Bicep extension
+- **Container-native** — Deploy on ACI, AKS, App Service, or locally with Docker
+- **Multi-runtime** — Choose .NET, Python, or PowerShell based on your stack
+- **Observable** — Structured logging, OpenTelemetry support, Scalar API explorer
 
-### 🏗️ Implementation Options
+### Implementation Options
 
 Three functionally equivalent implementations are included — pick the runtime that fits your infrastructure:
 

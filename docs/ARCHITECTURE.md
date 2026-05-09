@@ -8,70 +8,25 @@ ITL.Bicep.Extensions.AzureDevOps is a **Bicep extensibility provider** that impl
 
 ### Traditional Bicep Deployment Flow
 
-```
-┌─────────────┐
-│  .bicep     │
-│  template   │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│  Bicep CLI  │
-│  (compile)  │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│  ARM JSON   │
-│  template   │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│ Azure ARM   │
-│ deployment  │
-└─────────────┘
+```mermaid
+flowchart TD
+    A[.bicep template] --> B[Bicep CLI compile]
+    B --> C[ARM JSON template]
+    C --> D[Azure ARM deployment]
 ```
 
 ### Extensibility Provider Flow
 
-```
-┌─────────────┐
-│  .bicep     │
-│  template   │
-│  with       │
-│  extension  │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────────────────────────────────────┐
-│         Bicep CLI (compile)                 │
-│                                             │
-│  ┌──────────────────────────────────────┐  │
-│  │  1. Detect extension resource        │  │
-│  │  2. Call provider HTTP API           │  │
-│  │     (Preview/Save/Get/Delete)        │  │
-│  │  3. Get response                     │  │
-│  │  4. Continue compilation             │  │
-│  └──────────────────────────────────────┘  │
-└──────┬──────────────────────────────────────┘
-       │                    ▲
-       │                    │ HTTP
-       ▼                    │
-┌─────────────┐      ┌──────┴──────┐
-│  ARM JSON   │      │  Provider   │
-│  template   │      │  Container  │
-│  (Azure     │      │             │
-│   resources │      │  ┌────────┐ │
-│   only)     │      │  │Handler │ │
-└──────┬──────┘      │  └────┬───┘ │
-       │             │       │     │
-       │             │       ▼     │
-       ▼             │  ┌────────┐ │
-┌─────────────┐      │  │  ADO   │ │
-│ Azure ARM   │      │  │  API   │ │
-│ deployment  │      │  └────────┘ │
-└─────────────┘      └─────────────┘
+```mermaid
+flowchart TD
+    A[.bicep template with extension] --> B[Bicep CLI compile]
+    B -->|1. Detect extension resource| B
+    B -->|2. Call provider HTTP API<br/>Preview/Save/Get/Delete| C[Provider Container]
+    C -->|3. Response| B
+    B -->|4. Continue compilation| D[ARM JSON template<br/>Azure resources only]
+    D --> E[Azure ARM deployment]
+    C --> F[Handler]
+    F --> G[ADO API]
 ```
 
 **Key insight**: Extension resources are processed **client-side** during Bicep compilation. The Azure ARM deployment never sees the Azure DevOps resources — they are created directly via the provider before the Azure deployment starts.
@@ -80,60 +35,33 @@ ITL.Bicep.Extensions.AzureDevOps is a **Bicep extensibility provider** that impl
 
 ### Provider Components
 
-```
-┌─────────────────────────────────────────────────────┐
-│              HTTP API Layer                         │
-│  (ASP.NET Core / FastAPI / Pode)                   │
-│                                                     │
-│  Endpoints:                                         │
-│  • POST /ServiceConnection/preview                  │
-│  • POST /ServiceConnection/save                     │
-│  • POST /ServiceConnection/get                      │
-│  • POST /ServiceConnection/delete                   │
-└──────────────────────┬──────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────┐
-│              Handler Layer                          │
-│                                                     │
-│  • ServiceConnectionPreviewHandler                  │
-│  • ServiceConnectionCreateOrUpdateHandler           │
-│  • ServiceConnectionGetHandler                      │
-│  • ServiceConnectionDeleteHandler                   │
-│                                                     │
-│  Responsibilities:                                  │
-│  - Validate request schema                          │
-│  - Map Bicep model → ADO API model                 │
-│  - Call ADO client                                  │
-│  - Map ADO response → Bicep response               │
-│  - Error handling + logging                         │
-└──────────────────────┬──────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────┐
-│              ADO Client Service                     │
-│                                                     │
-│  Methods:                                           │
-│  • GetServiceConnectionAsync()                      │
-│  • CreateOrUpdateServiceConnectionAsync()           │
-│  • DeleteServiceConnectionAsync()                   │
-│                                                     │
-│  Responsibilities:                                  │
-│  - Acquire Azure AD token via DefaultAzureCredential│
-│  - Construct ADO REST API calls                     │
-│  - Handle ADO-specific error codes                  │
-│  - Retry logic + circuit breaker                    │
-└──────────────────────┬──────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────┐
-│        Azure DevOps REST API                        │
-│  https://dev.azure.com/{org}/_apis/serviceendpoint │
-│                                                     │
-│  Authentication:                                    │
-│  Bearer {Azure AD token}                           │
-│  Resource: 499b84ac-1321-427f-aa17-267ca6975798   │
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A[HTTP API Layer<br/>ASP.NET Core / FastAPI / Pode] --> B[Handler Layer]
+    B --> C[ADO Client Service]
+    C --> D[Azure DevOps REST API]
+    
+    subgraph API["HTTP API Endpoints"]
+        A1[POST /ServiceConnection/preview]
+        A2[POST /ServiceConnection/save]
+        A3[POST /ServiceConnection/get]
+        A4[POST /ServiceConnection/delete]
+    end
+    
+    subgraph Handlers["Handler Layer Responsibilities"]
+        B1[Validate request schema]
+        B2[Map Bicep model to ADO API model]
+        B3[Call ADO client]
+        B4[Map ADO response to Bicep response]
+        B5[Error handling + logging]
+    end
+    
+    subgraph ADO["ADO Client Responsibilities"]
+        C1[Acquire Azure AD token via DefaultAzureCredential]
+        C2[Construct ADO REST API calls]
+        C3[Handle ADO-specific error codes]
+        C4[Retry logic + circuit breaker]
+    end
 ```
 
 ## Authentication Flow
@@ -142,26 +70,19 @@ ITL.Bicep.Extensions.AzureDevOps is a **Bicep extensibility provider** that impl
 
 The provider uses **Azure Identity SDK** (`DefaultAzureCredential`) which tries the following credential sources in order:
 
-```
-1. AZURE_AD_TOKEN environment variable (override)
-   ↓ (if not set)
-2. Workload Identity Federation
-   - AZURE_FEDERATED_TOKEN_FILE + AZURE_CLIENT_ID + AZURE_TENANT_ID
-   - Used in: AKS pods with federated identity, Azure Pipelines
-   ↓ (if not AKS/Pipelines)
-3. Managed Identity
-   - AZURE_CLIENT_ID (user-assigned) or system-assigned
-   - Used in: ACI, App Service, Azure VMs, AKS node pools
-   ↓ (if not Azure infrastructure)
-4. Azure CLI credential (az login)
-   - Reads ~/.azure/accessTokens.json
-   - Used in: Local development
-   ↓ (if not Azure CLI)
-5. Visual Studio / VS Code credential
-   - Reads VS/VS Code auth cache
-   - Used in: Local development with IDEs
-   ↓ (if all fail)
-❌ AuthenticationFailedException
+```mermaid
+flowchart TD
+    A[Start] --> B{AZURE_AD_TOKEN<br/>env variable?}
+    B -->|Yes| SUCCESS[Token Acquired]
+    B -->|No| C{Workload Identity<br/>Federation?}
+    C -->|Yes<br/>AKS/Azure Pipelines| SUCCESS
+    C -->|No| D{Managed Identity?}
+    D -->|Yes<br/>ACI/App Service/VM| SUCCESS
+    D -->|No| E{Azure CLI<br/>az login?}
+    E -->|Yes<br/>Local dev| SUCCESS
+    E -->|No| F{Visual Studio /<br/>VS Code?}
+    F -->|Yes<br/>Local dev IDEs| SUCCESS
+    F -->|No| FAIL[AuthenticationFailedException]
 ```
 
 ### Token Acquisition
@@ -278,24 +199,29 @@ Provider → Find service connection by name
 
 ### Provider Error Flow
 
-```
-Request → Handler
-          ↓
-       Validation
-          ├─ Schema invalid → 400 Bad Request
-          ├─ Missing auth   → 401 Unauthorized
-          └─ Valid          → Continue
-          ↓
-       ADO API Call
-          ├─ 401 Unauthorized → Identity not in ADO org
-          ├─ 403 Forbidden    → Insufficient permissions
-          ├─ 404 Not Found    → Project/connection doesn't exist
-          ├─ 409 Conflict     → Duplicate name (rare)
-          ├─ 429 Rate Limit   → Retry with backoff
-          ├─ 5xx Server Error → Retry with backoff
-          └─ 200/201 OK       → Success
-          ↓
-       Response
+```mermaid
+flowchart TD
+    A[Request] --> B[Handler]
+    B --> C{Validation}
+    C -->|Schema invalid| D[400 Bad Request]
+    C -->|Missing auth| E[401 Unauthorized]
+    C -->|Valid| F[ADO API Call]
+    F -->|401| G[Identity not in ADO org]
+    F -->|403| H[Insufficient permissions]
+    F -->|404| I[Project/connection doesn't exist]
+    F -->|409| J[Duplicate name]
+    F -->|429| K[Retry with backoff]
+    F -->|5xx| L[Retry with backoff]
+    F -->|200/201| M[Success]
+    D --> N[Response]
+    E --> N
+    G --> N
+    H --> N
+    I --> N
+    J --> N
+    K --> N
+    L --> N
+    M --> N
 ```
 
 ### Common Error Scenarios

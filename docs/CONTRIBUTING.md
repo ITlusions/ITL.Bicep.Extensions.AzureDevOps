@@ -277,9 +277,9 @@ Open a pull request at: https://github.com/ITlusions/ITL.Bicep.Extensions.AzureD
 ## Code Review Process
 
 1. **Automated checks**:
-   - ✅ All tests pass
-   - ✅ Code style checks pass (ruff, dotnet format, PSScriptAnalyzer)
-   - ✅ No merge conflicts
+   - All tests pass
+   - Code style checks pass (ruff, dotnet format, PSScriptAnalyzer)
+   - No merge conflicts
 
 2. **Manual review**:
    - Code quality and maintainability
@@ -531,4 +531,4 @@ By contributing, you agree that your contributions will be licensed under the [M
 
 ---
 
-**Thank you for contributing! 🎉**
+**Thank you for contributing!**

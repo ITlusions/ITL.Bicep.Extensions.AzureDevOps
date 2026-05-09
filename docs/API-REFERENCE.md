@@ -36,9 +36,9 @@ The `identifiers` object uniquely identifies a service connection resource.
 
 | Property | Type | Required | Description |
 |---|---|---|---|
-| `organization` | string | ✅ | Azure DevOps organization name (e.g., `itlusions`) |
-| `project` | string | ✅ | Project name within the organization |
-| `name` | string | ✅ | Service connection name (must be unique within the project) |
+| `organization` | string | Yes | Azure DevOps organization name (e.g., `itlusions`) |
+| `project` | string | Yes | Project name within the organization |
+| `name` | string | Yes | Service connection name (must be unique within the project) |
 
 **Example**:
 
@@ -63,13 +63,13 @@ All service connection types support these properties:
 
 | Property | Type | Required | Description |
 |---|---|---|---|
-| `name` | string | ✅ | Display name (shown in Azure DevOps UI) |
-| `type` | string | ✅ | Connection type (`AzureRM`, `GitHub`, `dockerregistry`, etc.) |
-| `url` | string | ✅ | Target service URL |
-| `authorization` | object | ✅ | Authentication configuration |
-| `data` | object | ✅ | Type-specific metadata |
-| `isShared` | bool | ❌ | Share connection across projects (default: `false`) |
-| `owner` | string | ❌ | Owner scope (default: `Library`) |
+| `name` | string | Yes | Display name (shown in Azure DevOps UI) |
+| `type` | string | Yes | Connection type (`AzureRM`, `GitHub`, `dockerregistry`, etc.) |
+| `url` | string | Yes | Target service URL |
+| `authorization` | object | Yes | Authentication configuration |
+| `data` | object | Yes | Type-specific metadata |
+| `isShared` | bool | No | Share connection across projects (default: `false`) |
+| `owner` | string | No | Owner scope (default: `Library`) |
 
 ---
 
@@ -121,18 +121,18 @@ resource azureWif 'ServiceConnection@2024-01-01' = {
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `tenantid` | string | ✅ | Azure AD tenant ID |
-| `serviceprincipalid` | string | ✅ | Service principal (app registration) client ID |
+| `tenantid` | string | Yes | Azure AD tenant ID |
+| `serviceprincipalid` | string | Yes | Service principal (app registration) client ID |
 
 **Data properties**:
 
 | Property | Type | Required | Description |
 |---|---|---|---|
-| `subscriptionId` | string | ✅ | Azure subscription ID |
-| `subscriptionName` | string | ✅ | Subscription display name |
-| `environment` | string | ❌ | Azure environment (default: `AzureCloud`, options: `AzureCloud`, `AzureChinaCloud`, `AzureUSGovernment`, `AzureGermanCloud`) |
-| `scopeLevel` | string | ❌ | Scope level (default: `Subscription`, options: `Subscription`, `ManagementGroup`) |
-| `creationMode` | string | ❌ | Creation mode (default: `Manual`) |
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `subscriptionName` | string | Yes | Subscription display name |
+| `environment` | string | No | Azure environment (default: `AzureCloud`, options: `AzureCloud`, `AzureChinaCloud`, `AzureUSGovernment`, `AzureGermanCloud`) |
+| `scopeLevel` | string | No | Scope level (default: `Subscription`, options: `Subscription`, `ManagementGroup`) |
+| `creationMode` | string | No | Creation mode (default: `Manual`) |
 
 ---
 
@@ -174,16 +174,16 @@ resource azureSp 'ServiceConnection@2024-01-01' = {
 }
 ```
 
-**⚠️ Warning**: Store `serviceprincipalkey` in Azure Key Vault and reference it as a Bicep parameter. Never commit secrets to source control.
+**Warning**: Store `serviceprincipalkey` in Azure Key Vault and reference it as a Bicep parameter. Never commit secrets to source control.
 
 **Authorization parameters**:
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `tenantid` | string | ✅ | Azure AD tenant ID |
-| `serviceprincipalid` | string | ✅ | Service principal client ID |
-| `authenticationType` | string | ✅ | Authentication type (always `spnKey` for client secret) |
-| `serviceprincipalkey` | string | ✅ | Client secret (mark parameter as `@secure()`) |
+| `tenantid` | string | Yes | Azure AD tenant ID |
+| `serviceprincipalid` | string | Yes | Service principal client ID |
+| `authenticationType` | string | Yes | Authentication type (always `spnKey` for client secret) |
+| `serviceprincipalkey` | string | Yes | Client secret (mark parameter as `@secure()`) |
 
 **Data properties**: Same as WorkloadIdentityFederation scheme.
 
@@ -227,7 +227,7 @@ resource github 'ServiceConnection@2024-01-01' = {
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `accessToken` | string | ✅ | GitHub Personal Access Token (mark parameter as `@secure()`) |
+| `accessToken` | string | Yes | GitHub Personal Access Token (mark parameter as `@secure()`) |
 
 **Data properties**: Empty object `{}`.
 
@@ -293,16 +293,16 @@ resource acr 'ServiceConnection@2024-01-01' = {
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `username` | string | ✅ | Registry username |
-| `password` | string | ✅ | Registry password (mark parameter as `@secure()`) |
-| `email` | string | ❌ | Email address (optional) |
-| `registry` | string | ✅ | Registry URL |
+| `username` | string | Yes | Registry username |
+| `password` | string | Yes | Registry password (mark parameter as `@secure()`) |
+| `email` | string | No | Email address (optional) |
+| `registry` | string | Yes | Registry URL |
 
 **Data properties**:
 
 | Property | Type | Required | Description |
 |---|---|---|---|
-| `registrytype` | string | ✅ | Registry type (`DockerHub`, `ContainerRegistry`, `Others`) |
+| `registrytype` | string | Yes | Registry type (`DockerHub`, `ContainerRegistry`, `Others`) |
 
 ---
 
@@ -576,7 +576,7 @@ resource azureConn 'ServiceConnection@2024-01-01' = {
 
 Prefer `WorkloadIdentityFederation` over `ServicePrincipal` scheme:
 
-✅ **DO**: Use WIF (no secrets, no rotation, more secure)
+**DO**: Use WIF (no secrets, no rotation, more secure)
 
 ```bicep
 authorization: {
@@ -585,7 +585,7 @@ authorization: {
 }
 ```
 
-❌ **DON'T**: Use Service Principal with client secret unless WIF is not supported
+**DON'T**: Use Service Principal with client secret unless WIF is not supported
 
 ### 2. Never Hardcode Secrets
 
@@ -604,10 +604,10 @@ resource github 'ServiceConnection@2024-01-01' = {
 }
 ```
 
-❌ **DON'T**:
+**DON'T**:
 
 ```bicep
-parameters: { accessToken: 'ghp_1234567890...' }  // ❌ Hardcoded secret
+parameters: { accessToken: 'ghp_1234567890...' }  // Hardcoded secret
 ```
 
 ### 3. Use Consistent Naming
@@ -627,7 +627,7 @@ Only share connections across projects when truly needed:
 
 ```bicep
 properties: {
-  isShared: true  // ⚠️ Use with caution
+  isShared: true  // Use with caution
 }
 ```
 

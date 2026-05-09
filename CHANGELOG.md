@@ -67,8 +67,8 @@ When introducing breaking changes, we will:
 
 | Version | Supported          | Notes                          |
 |---------|--------------------|--------------------------------|
-| 1.x     | ✅ Yes             | Current stable release         |
-| 0.x     | ❌ No              | Pre-release (not published)    |
+| 1.x     | Yes                | Current stable release         |
+| 0.x     | No                 | Pre-release (not published)    |
 
 ---
 
