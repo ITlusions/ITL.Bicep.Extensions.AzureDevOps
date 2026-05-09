@@ -6,15 +6,19 @@ Production deployment patterns for the ITL Bicep Azure DevOps extensibility prov
 
 The provider must be running and network-accessible when you execute `az deployment` commands. This guide covers deployment options ranging from local development to enterprise production environments.
 
+**Most users don't need a dedicated server!** The simplest approach is to run the provider as a **service container** in your CI/CD pipeline and communicate with it via `localhost` or the service container hostname. This requires zero infrastructure management and costs nothing extra. See [CI/CD Service Containers](#5-cicd-service-containers) below.
+
 ## Deployment Options Comparison
 
 | Option | Use Case | Complexity | Cost | Scalability |
 |---|---|---|---|---|
+| **Service Containers (CI/CD)** | Pipeline-only usage (recommended) | Low | Included | N/A |
 | **Local Docker** | Development, testing | Low | Free | N/A |
 | **Azure Container Instances** | Simple production, CI/CD | Low | ~$15/month | Low |
 | **Azure Kubernetes Service** | Enterprise, high availability | High | ~$70/month+ | High |
 | **Azure App Service** | Managed PaaS, easy scaling | Medium | ~$50/month+ | Medium |
-| **Service Containers (CI/CD)** | Pipeline-only usage | Low | Included | N/A |
+
+**Recommended starting point** — No infrastructure to manage, no extra cost, provider spins up only when pipeline runs.
 
 ---
 
@@ -445,9 +449,16 @@ az network private-endpoint create \
 
 ---
 
-## 5. CI/CD Service Containers
+## 5. CI/CD Service Containers (Recommended)
 
-**Best for**: Pipeline deployments only (no persistent provider)
+**Best for**: Pipeline deployments (no dedicated server needed!)
+
+**Why this is the simplest approach:**
+- Provider spins up automatically when your pipeline runs
+- No infrastructure to manage or pay for
+- Communicate via `localhost` (GitHub Actions) or service name (Azure Pipelines)
+- Uses the pipeline's managed identity for authentication
+- Provider shuts down when pipeline completes
 
 ### Azure Pipelines
 
